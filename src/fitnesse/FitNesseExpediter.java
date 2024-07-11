@@ -3,6 +3,7 @@
 package fitnesse;
 
 import fitnesse.components.LogData;
+import fitnesse.components.LogDataBuilder;
 import fitnesse.http.*;
 import fitnesse.responders.ErrorResponder;
 import fitnesse.wiki.WikiPageUtil;
@@ -152,13 +153,20 @@ public class FitNesseExpediter implements ResponseSender, Runnable {
   }
 
   public static LogData makeLogData(Socket socket, Request request, Response response) {
-    return new LogData(
-        ((InetSocketAddress) socket.getRemoteSocketAddress()).getAddress().getHostAddress(),
-        new GregorianCalendar(),
-        request.getRequestLine(),
-        response.getStatus(),
-        response.getContentSize(),
-        request.getAuthorizationUsername());
+    LogDataBuilder builder = new LogDataBuilder(
+      new GregorianCalendar(),
+      response.getStatus(),
+      response.getContentSize()
+    );
+
+// Optionally set username if available
+    if (request.getAuthorizationUsername() != null) {
+      builder.username(request.getAuthorizationUsername());
+    }
+    builder.host(((InetSocketAddress) socket.getRemoteSocketAddress()).getAddress().getHostAddress());
+    builder.requestLine(request.getRequestLine());
+    LogData logData = builder.build();
+    return logData;
   }
 
   public void log(Socket s, Request request, Response response) {

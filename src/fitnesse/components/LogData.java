@@ -12,12 +12,12 @@ public class LogData {
   public final int size;
   public final String username;
 
-  public LogData(String host, Calendar time, String requestLine, int status, int size, String username) {
-    this.host = host;
-    this.time = time;
-    this.requestLine = requestLine;
-    this.status = status;
-    this.size = size;
-    this.username = username;
+  public LogData(LogDataBuilder logDataBuilder) {
+    this.host = logDataBuilder.getHost();
+    this.time = logDataBuilder.getTime();
+    this.requestLine = logDataBuilder.getRequestLine();
+    this.status = logDataBuilder.getStatus();
+    this.size = logDataBuilder.getSize();
+    this.username = logDataBuilder.getUsername();
   }
 }

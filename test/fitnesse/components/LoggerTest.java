@@ -37,13 +37,10 @@ public class LoggerTest {
     TimeZone z = TimeZone.getTimeZone("GMT-1:00");
     Calendar time = new GregorianCalendar(2003, 2, 6, 13, 42, 5);
     time.setTimeZone(z);
-    ld = new LogData(
-            "myHost",
+    ld = new LogDataBuilder(
             time,
-            "request",
             42,
-            666,
-            null);
+            666).host("myHost").requestLine("request").build();
   }
 
   @After
@@ -101,13 +98,7 @@ public class LoggerTest {
   @Test
   public void testLogSecondLineInSameFile() throws Exception {
     l.log(ld);
-    LogData ld2 = new LogData(
-            "newHost",
-            ld.time,
-            ld.requestLine,
-            ld.status,
-            ld.size,
-            ld.username);
+    LogData ld2 = new LogDataBuilder(ld.time, ld.status, ld.size).username(ld.username).host("newHost").requestLine(ld.requestLine).build();
     l.log(ld2);
     File dir = l.getDirectory();
     File file = new File(dir, filename);
@@ -122,13 +113,7 @@ public class LoggerTest {
   public void testLogLineInNewFile() throws Exception {
     Calendar time = (Calendar) ld.time.clone();
     time.add(Calendar.DATE, 1);
-    LogData nextDay = new LogData(
-            ld.host,
-            time,
-            ld.requestLine,
-            ld.status,
-            ld.size,
-            ld.username);
+    LogData nextDay = new LogDataBuilder(time, ld.status, ld.size).host(ld.host).requestLine(ld.requestLine).username(ld.username).build();
     l.log(ld);
     l.log(nextDay);
     l.close();
@@ -144,13 +129,7 @@ public class LoggerTest {
 
   @Test
   public void testLoggingIncludesUsername() throws Exception {
-    ld = new LogData(
-            ld.host,
-            ld.time,
-            ld.requestLine,
-            ld.status,
-            ld.size,
-            "Joe");
+    ld = new LogDataBuilder(ld.time, ld.status, ld.size).host(ld.host).requestLine(ld.requestLine).username("Joe").build();
     l.log(ld);
     l.close();
     File dir = l.getDirectory();
