@@ -51,34 +51,52 @@ public class TypeAdapter {
     a.isRegex = isRegex;
     return a;
   }
+  private static TypeAdapter getPrimitiveTypeAdapter(Class<?> type ) {
+    Map<Class<?>,TypeAdapter> primitiveAdapters = new HashMap<>();
+    primitiveAdapters.put(byte.class,new ByteAdapter());
+    primitiveAdapters.put(short.class, new ShortAdapter());
+    primitiveAdapters.put(int.class, new IntAdapter());
+    primitiveAdapters.put(long.class, new LongAdapter());
+    primitiveAdapters.put(float.class, new FloatAdapter());
+    primitiveAdapters.put(double.class, new DoubleAdapter());
+    primitiveAdapters.put(char.class, new CharAdapter());
+    primitiveAdapters.put(boolean.class, new BooleanAdapter());
+    TypeAdapter adapter = primitiveAdapters.get(type);
+    if ( adapter == null ) {
+      throw new UnsupportedOperationException("can't yet adapt " + type);
+    }
+    return adapter;
+  }
+  private static TypeAdapter getNonPrimitiveTypeAdapter(Class<?> type  ) {
+    Map<Class<?>, TypeAdapter> adapters = new HashMap<>();
+    adapters.put(Byte.class, new ClassByteAdapter());
+    adapters.put(Short.class, new ClassShortAdapter());
+    adapters.put(Integer.class, new ClassIntegerAdapter());
+    adapters.put(Long.class, new ClassLongAdapter());
+    adapters.put(Float.class, new ClassFloatAdapter());
+    adapters.put(Double.class, new ClassDoubleAdapter());
+    adapters.put(Character.class, new ClassCharacterAdapter());
+    adapters.put(Boolean.class, new ClassBooleanAdapter());
+    adapters.put(Object[].class, new ArrayAdapter()); // Example for array adapter
+
+    Object delegate = PARSE_DELEGATES.get(type);
+    if (delegate instanceof DelegateClassAdapter)
+      return (TypeAdapter) ((DelegateClassAdapter) delegate).clone();
+    if (delegate instanceof DelegateObjectAdapter)
+      return (TypeAdapter) ((DelegateObjectAdapter) delegate).clone();
+
+    TypeAdapter adapter = adapters.get(type);
+    if (adapter == null && type.isArray()) {
+      return new ArrayAdapter();
+    }
+    return adapter != null ? adapter : new TypeAdapter();
+  }
 
   public static TypeAdapter adapterFor(Class<?> type) throws UnsupportedOperationException {
     if (type.isPrimitive()) {
-      if (type.equals(byte.class)) return new ByteAdapter();
-      if (type.equals(short.class)) return new ShortAdapter();
-      if (type.equals(int.class)) return new IntAdapter();
-      if (type.equals(long.class)) return new LongAdapter();
-      if (type.equals(float.class)) return new FloatAdapter();
-      if (type.equals(double.class)) return new DoubleAdapter();
-      if (type.equals(char.class)) return new CharAdapter();
-      if (type.equals(boolean.class)) return new BooleanAdapter();
-      throw new UnsupportedOperationException("can't yet adapt " + type);
+      return getPrimitiveTypeAdapter(type);
     } else {
-      Object delegate = PARSE_DELEGATES.get(type);
-      if (delegate instanceof DelegateClassAdapter)
-        return (TypeAdapter) ((DelegateClassAdapter) delegate).clone();
-      if (delegate instanceof DelegateObjectAdapter)
-        return (TypeAdapter) ((DelegateObjectAdapter) delegate).clone();
-      if (type.equals(Byte.class)) return new ClassByteAdapter();
-      if (type.equals(Short.class)) return new ClassShortAdapter();
-      if (type.equals(Integer.class)) return new ClassIntegerAdapter();
-      if (type.equals(Long.class)) return new ClassLongAdapter();
-      if (type.equals(Float.class)) return new ClassFloatAdapter();
-      if (type.equals(Double.class)) return new ClassDoubleAdapter();
-      if (type.equals(Character.class)) return new ClassCharacterAdapter();
-      if (type.equals(Boolean.class)) return new ClassBooleanAdapter();
-      if (type.isArray()) return new ArrayAdapter();
-      return new TypeAdapter();
+      return getNonPrimitiveTypeAdapter(type);
     }
   }
 
