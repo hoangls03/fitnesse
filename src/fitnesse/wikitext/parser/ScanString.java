@@ -16,13 +16,13 @@ public class ScanString {
         this.markStartOffset = other.markStartOffset;
     }
 
-    public void setOffset(int offset) { this.offset = offset; }
+    protected void setOffset(int offset) { this.offset = offset; }
     public int getOffset() { return offset; }
-    public void moveNext() { offset++; }
-    public void moveNext(int length) { offset += length; }
-    public boolean isEnd() { return isEnd(0); }
-    public boolean isEnd(int startAt) { return offset + startAt >= input.length(); }
-    public void markStart(int markStartOffset) { this.markStartOffset = markStartOffset; }
+    protected void moveNext() { offset++; }
+    protected void moveNext(int length) { offset += length; }
+    protected boolean isEnd() { return isEnd(0); }
+    protected boolean isEnd(int startAt) { return offset + startAt >= input.length(); }
+    protected void markStart(int markStartOffset) { this.markStartOffset = markStartOffset; }
 
     public boolean matches(String match, int startsAt) {
         if (match.isEmpty()) return false;
@@ -34,7 +34,7 @@ public class ScanString {
         return matches(match, 0);
     }
 
-    public boolean startsLine(int startAt) {
+    protected boolean startsLine(int startAt) {
         return offset + startAt == 0 || offset + startAt == markStartOffset || input.charAt(offset + startAt - 1) == '\n';
     }
 
