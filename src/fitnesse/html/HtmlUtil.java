@@ -24,17 +24,21 @@ public class HtmlUtil {
               "output|datalist|progress|command|time|meter)([ >].*</\\1>|[^>]*/>)";
   private static final Pattern HTML_PATTERN = Pattern.compile("^" + HTML_CELL_CONTENT_PATTERN_TEXT + "$",
                                                         Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-
+  private static HtmlTag createTag(String name, String content, String spanClass ) {
+    HtmlTag htmlTag = new HtmlTag(name);
+    htmlTag.add(content);
+    if ( spanClass != null ) {
+      htmlTag.addAttribute("class",spanClass);
+    }
+    return htmlTag;
+  }
   public static HtmlTag makeBold(String content) {
-    HtmlTag bold = new HtmlTag("b");
-    bold.add(content);
+    HtmlTag bold = createTag("b",content,null);
     return bold;
   }
 
   public static HtmlTag makeSpanTag(String spanClass, String content) {
-    HtmlTag span = new HtmlTag("span");
-    span.addAttribute("class", spanClass);
-    span.add(content);
+    HtmlTag span = createTag("span",content,spanClass);
     return span;
   }
 
