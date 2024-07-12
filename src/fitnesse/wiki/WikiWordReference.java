@@ -82,18 +82,18 @@ public class WikiWordReference {
   }
 
   public Optional<String> getRenamedContent(String content, WikiPage pageToRename, String newName) {
-    String fullPathToReferent = getQualifiedWikiWord(content);
-    WikiPagePath pathToPageBeingRenamed = pageToRename.getFullPath();
-    pathToPageBeingRenamed.makeAbsolute();
-    String absolutePathToPageBeingRenamed = PathParser.render(pathToPageBeingRenamed);
+    String fullPath = getQualifiedWikiWord(content);
+    WikiPagePath pathRenamed = pageToRename.getFullPath();
+    pathRenamed.makeAbsolute();
+    String absPath = PathParser.render(pathRenamed);
 
     Optional<String> renamedContent;
-    if (refersTo(fullPathToReferent, absolutePathToPageBeingRenamed)) {
-      int oldNameLength = absolutePathToPageBeingRenamed.length();
-      String renamedPath = "." + rename(absolutePathToPageBeingRenamed.substring(1), newName);
-      String pathAfterRenamedPage = fullPathToReferent.substring(oldNameLength);
-      String fullRenamedPathToReferent = renamedPath + pathAfterRenamedPage;
-      String renamedReference = makeRenamedRelativeReference(content, PathParser.parse(fullRenamedPathToReferent));
+    if (refersTo(fullPath, absPath)) {
+      int oldNameLength = absPath.length();
+      String renamedPath = "." + rename(absPath.substring(1), newName);
+      String pathAfter = fullPath.substring(oldNameLength);
+      String PathReferent = renamedPath + pathAfter;
+      String renamedReference = makeRenamedRelativeReference(content, PathParser.parse(PathReferent));
       renamedContent = Optional.of(renamedReference);
     } else {
       renamedContent = Optional.empty();
